@@ -54,7 +54,7 @@ RATE_LIMIT_COOLDOWN = 16 * 60   # seconds to wait after a 429 before retrying (X
 MAX_RATE_LIMIT_RETRIES = 1000   # effectively unlimited — keep retrying overnight rather than give up
 CRASH_COOLDOWN = 5 * 60         # seconds to wait before restarting after an unexpected crash
 LOG_FILE = "scrape.log"         # progress log, readable while the console isn't watched
-COOKIES_FILE = "cookies.json"   # exported from a real browser session, see docstring above
+#COOKIES_FILE = "cookies.json"   # exported from a real browser session, see docstring above
 # -----------------------------------------------------------------------
 
 
