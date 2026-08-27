@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEPSEE Sentiment Annotator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Devanagari:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #E9E6DC;
+      --surface: #FFFFFF;
+      --ink: #22252B;
+      --muted: #6E6D64;
+      --border: #DAD6C8;
+      --accent: #7A1F2B;
+      --positive: #2F7B4F;
+      --positive-bg: #E4EFE7;
+      --neutral: #5B5A52;
+      --neutral-bg: #EAE9E3;
+      --negative: #A6402E;
+      --negative-bg: #F4E5E1;
+      --unsure: #8B6F2E;
+      --unsure-bg: #F1EBDD;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .topbar {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 2px 20px;
+      border-bottom: 2px solid var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+    }
+    .brand span { color: var(--accent); }
+
+    .tally {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .tally b { color: var(--ink); }
+
+    .progress-track {
+      width: 100%;
+      max-width: 760px;
+      height: 6px;
+      background: var(--border);
+      margin-bottom: 32px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+  height: 100%;
+  width: var(--w, 0%);
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+    .card {
+      width: 100%;
+      max-width: 760px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 36px 32px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .tweet-text {
+      font-family: "IBM Plex Sans Devanagari", "Nirmala UI", sans-serif;
+      font-size: 24px;
+      line-height: 1.7;
+      color: var(--ink);
+      margin: 0 0 24px;
+      white-space: pre-wrap;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12.5px;
+      color: var(--muted);
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .meta a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .meta a:hover { text-decoration: underline; }
+
+    .choices {
+      width: 100%;
+      max-width: 760px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+    @media (max-width: 560px) {
+      .choices { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .choice-btn {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 16px 8px 14px;
+      cursor: pointer;
+      font-family: "IBM Plex Sans", sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .choice-btn:active { transform: scale(0.97); }
+    .choice-btn .key {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .choice-btn.positive:hover { background: var(--positive-bg); border-color: var(--positive); color: var(--positive); }
+    .choice-btn.neutral:hover  { background: var(--neutral-bg);  border-color: var(--neutral);  color: var(--neutral); }
+    .choice-btn.negative:hover { background: var(--negative-bg); border-color: var(--negative); color: var(--negative); }
+    .choice-btn.unsure:hover   { background: var(--unsure-bg);   border-color: var(--unsure);   color: var(--unsure); }
+
+    .hint {
+      max-width: 760px;
+      width: 100%;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+
+    .done-card {
+      width: 100%;
+      max-width: 760px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 60px 32px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">NEPSEE <span>Annotator</span></div>
+    <div class="tally"><b>{{ progress.labeled }}</b> / {{ progress.total }} ({{ progress.percent }}%)</div>
+  </div>
+
+  <div class="progress-track">
+  <div class="progress-fill" style="--w: {{ progress.percent }}%;"></div>
+</div>
+
+  {% if done %}
+    <div class="done-card">
+      <h1>All Tweets Annotated</h1>
+      <p>{{ progress.labeled }} of {{ progress.total }} records have been catalogued.</p>
+    </div>
+  {% else %}
+    <div class="card">
+      <p class="tweet-text">{{ tweet.text }}</p>
+      <div class="meta">
+        {% if tweet.handle %}<span>@{{ tweet.handle }}</span>{% endif %}
+        {% if tweet.created_at %}<span>{{ tweet.created_at }}</span>{% endif %}
+        {% if tweet.likes %}<span>♥ {{ tweet.likes }}</span>{% endif %}
+        {% if tweet.retweets %}<span>↻ {{ tweet.retweets }}</span>{% endif %}
+        {% if tweet.url %}<a href="{{ tweet.url }}" target="_blank" rel="noopener">Open Source ↗</a>{% endif %}
+      </div>
+    </div>
+
+    <div class="choices">
+      <form method="post" action="/rate" id="form-1">
+        <input type="hidden" name="tweet_id" value="{{ tweet.id }}">
+        <input type="hidden" name="label" value="positive">
+        <button type="submit" class="choice-btn positive">
+          <span class="key">1</span> Positive
+        </button>
+      </form>
+
+      <form method="post" action="/rate" id="form-2">
+        <input type="hidden" name="tweet_id" value="{{ tweet.id }}">
+        <input type="hidden" name="label" value="neutral">
+        <button type="submit" class="choice-btn neutral">
+          <span class="key">2</span> Neutral
+        </button>
+      </form>
+
+      <form method="post" action="/rate" id="form-3">
+        <input type="hidden" name="tweet_id" value="{{ tweet.id }}">
+        <input type="hidden" name="label" value="negative">
+        <button type="submit" class="choice-btn negative">
+          <span class="key">3</span> Negative
+        </button>
+      </form>
+
+      <form method="post" action="/rate" id="form-4">
+        <input type="hidden" name="tweet_id" value="{{ tweet.id }}">
+        <input type="hidden" name="label" value="dont_know">
+        <button type="submit" class="choice-btn unsure">
+          <span class="key">4</span> Don't know
+        </button>
+      </form>
+    </div>
+
+    <p class="hint">Press <b>1</b>, <b>2</b>, <b>3</b>, or <b>4</b> on your keyboard to rate instantly.</p>
+
+    <script>
+      document.addEventListener("keydown", (e) => {
+        const keyMap = { "1": "form-1", "2": "form-2", "3": "form-3", "4": "form-4" };
+        if (keyMap[e.key]) {
+          const targetForm = document.getElementById(keyMap[e.key]);
+          if (targetForm) targetForm.requestSubmit();
+        }
+      });
+    </script>
+  {% endif %}
+
+</body>
+</html>
