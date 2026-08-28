@@ -1,7 +1,6 @@
-# Secrets — never commit these
+# Secrets
 .env
 
-# twscrape's local session/account database (contains login cookies)
 accounts.db
 accounts.db-journal
 
@@ -11,10 +10,6 @@ __pycache__/
 .venv/
 venv/
 
-# Scraper output — usually you don't want raw scraped data in git,
-# especially once it grows past a sample file
-accounts_sample.csv
-*.csv
 
 # OS cruft
 .DS_Store

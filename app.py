@@ -71,7 +71,7 @@ def index():
         progress=progress,
     )
 
-
+#route
 @app.route("/rate", methods=["POST"])
 def rate():
     tweet_id = request.form.get("tweet_id")
