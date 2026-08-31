@@ -248,7 +248,7 @@
     <div class="choices">
       {% for key, name_en, name_np in labels %}
         <form method="post" action="{{ url_for('rate') }}" id="form-{{ loop.index }}">
-          <input type="hidden" name="row_id"      value="{{ tweet.row_id }}">
+          <input type="hidden" name="item_id"     value="{{ tweet.item_id }}">
           <input type="hidden" name="current_idx" value="{{ current_idx }}">
           <input type="hidden" name="label"       value="{{ key }}">
           <button type="submit"

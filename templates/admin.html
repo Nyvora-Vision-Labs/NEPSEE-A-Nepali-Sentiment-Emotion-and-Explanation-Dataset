@@ -21,6 +21,8 @@
     .count b { color:var(--ink); }
     .track { height:7px; background:var(--border); border-radius:4px; overflow:hidden; }
     .fill { height:100%; background:var(--accent); }
+    .warn { background:#F4E5E1; color:#8C2718; border:1px solid #E0C4BC;
+            border-radius:8px; padding:14px 16px; margin:16px 0; font-size:13px; line-height:1.55; }
     .dl { display:inline-block; margin-top:16px; padding:12px 20px; background:var(--accent);
           color:#fff; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; }
   </style>
@@ -38,6 +40,16 @@
       <div class="track"><div class="fill" style="width: {{ s.percent }}%;"></div></div>
     </div>
   {% endfor %}
+
+  {% if orphans %}
+    <div class="warn">
+      <b>{{ orphans|length }} label(s) point at sentences that are no longer in
+      filtered_data.csv.</b>
+      Someone regenerated the dataset and dropped or altered rows that had already
+      been annotated. Those labels are still in the database but will not appear in
+      the export. First few: {{ orphans[:5]|join(', ') }}
+    </div>
+  {% endif %}
 
   <a class="dl" href="{{ url_for('export_csv', token=token) }}">Download all annotations (CSV)</a>
 </div>

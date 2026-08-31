@@ -98,6 +98,8 @@ phone.
 
 **Design notes**
 
+- **Labels are keyed on `tweet_id:sentence_index`,** never on the row's position in the
+  file, so the corpus can be regenerated without labels drifting onto wrong sentences.
 - **Labels live in Postgres, not the CSV.** An earlier version wrote a shared
   `sentiment` column back into `filtered_data.csv` on every tap. That cannot represent
   three verdicts per sentence, and with three people labelling at once the read-modify-
@@ -150,7 +152,8 @@ phone.
 
 | Column | Description |
 |---|---|
-| `row_id` | Stable 0-based row identifier. **Annotations are keyed on this.** |
+| `row_id` | 0-based position in the file. Navigation only — *not* the annotation key |
+| *(derived)* `item_id` | `tweet_id:sentence_index`. **Annotations are keyed on this.** Not a column; computed at load |
 | `handle` | Source account |
 | `id`, `tweet_id` | Original tweet ID |
 | `text` | Original tweet text, unmodified |
@@ -161,9 +164,27 @@ phone.
 | `word_count`, `is_valid_nepali_only` | Filtering artefacts |
 | `sentiment` | Legacy single-annotator column, **no longer used or written** |
 
-> If you regenerate `filtered_data.csv`, keep `row_id` values stable. Annotations are
-> keyed on `row_id`, so renumbering would silently attach existing labels to the wrong
-> sentences.
+### Updating the corpus mid-annotation
+
+`filtered_data.csv` is the live source of what annotators see. Commit a change to it and
+Render redeploys, and the new sentences are served on the next page load.
+
+Annotations are keyed on **`item_id`** — `tweet_id:sentence_index` — not on `row_id`.
+That distinction is what makes the file safe to regenerate: rows can be added, dropped,
+re-filtered and renumbered, and every existing label stays attached to the sentence it
+was actually given for. `row_id` is a position in the file and shifts whenever the file
+changes, which is why it is not used as a key.
+
+Two things to preserve when regenerating:
+
+- **`tweet_id` and `sentence_index` must stay stable** for sentences that already exist.
+  Re-running `split_sentences.py` on unchanged text reproduces them exactly.
+- **Each `(tweet_id, sentence_index)` pair must be unique.** The app refuses to start
+  otherwise, rather than let two sentences silently share one label.
+
+If a regenerated CSV drops or alters sentences that were already labelled, those labels
+are kept in the database but no longer match anything. `/admin` reports them as orphans
+so the loss is visible rather than silent.
 
 ---
 

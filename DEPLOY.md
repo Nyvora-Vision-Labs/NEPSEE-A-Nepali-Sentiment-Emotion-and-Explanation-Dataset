@@ -69,9 +69,12 @@ The export has one row per sentence with `annotator_1`, `annotator_2`,
   fast. Warn the annotators so they don't think it's broken.
 - **Nothing is lost on restart** — all labels live in Neon, not on the server's
   disk. `data/filtered_data.csv` is only ever read, never written.
-- **Changing the dataset**: if you re-generate `filtered_data.csv`, keep the
-  `row_id` values stable. Labels are keyed on `row_id`; renumbering rows would
-  attach existing labels to the wrong sentences.
+- **Changing the dataset**: commit a new `data/filtered_data.csv` and Render
+  redeploys with it automatically. Labels are keyed on `tweet_id:sentence_index`,
+  not on row position, so rows can be added, dropped or renumbered without
+  existing labels drifting onto the wrong sentences. Keep `tweet_id` and
+  `sentence_index` stable for sentences that already exist, and check `/admin`
+  afterwards — it flags any labels whose sentence has disappeared.
 
 ## Running locally
 

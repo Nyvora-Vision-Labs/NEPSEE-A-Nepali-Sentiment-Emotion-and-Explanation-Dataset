@@ -84,10 +84,10 @@ engine = create_engine(
 CREATE_TABLE_SQL = """
     CREATE TABLE IF NOT EXISTS annotations (
         annotator_id INTEGER NOT NULL,
-        row_id       TEXT    NOT NULL,
+        item_id      TEXT    NOT NULL,
         label        TEXT    NOT NULL,
         updated_at   TIMESTAMPTZ NOT NULL,
-        PRIMARY KEY (annotator_id, row_id)
+        PRIMARY KEY (annotator_id, item_id)
     )
 """
 
@@ -144,8 +144,15 @@ def load_rows() -> list[dict]:
         except ValueError:
             sentence_num = 1
 
+        sentence_index = (r.get("sentence_index") or "0").strip()
+        # Annotations are keyed on this, NOT on the row's position in the file.
+        # tweet_id + sentence_index survives re-filtering, reordering and
+        # regenerating the CSV; row_id (a positional index) does not.
+        item_id = f"{tid}:{sentence_index}" if tid else "row:" + (r.get("row_id") or str(i)).strip()
+
         rows.append(
             {
+                "item_id": item_id,
                 "row_id": (r.get("row_id") or str(i)).strip(),
                 "handle": (r.get("handle") or "").strip(),
                 "text": text_value,
@@ -159,8 +166,19 @@ def load_rows() -> list[dict]:
 
 
 ROWS = load_rows()
-ROW_INDEX = {r["row_id"]: i for i, r in enumerate(ROWS)}
+ROW_INDEX = {r["item_id"]: i for i, r in enumerate(ROWS)}
 TOTAL = len(ROWS)
+
+# A duplicate item_id would make two sentences share one label. Fail loudly at
+# startup rather than silently merging them.
+if len(ROW_INDEX) != TOTAL:
+    from collections import Counter
+
+    dupes = [k for k, n in Counter(r["item_id"] for r in ROWS).items() if n > 1]
+    raise SystemExit(
+        f"{TOTAL - len(ROW_INDEX)} duplicate item_id(s) in {CSV_PATH}, e.g. {dupes[:5]}. "
+        "Each (tweet_id, sentence_index) pair must be unique."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -217,26 +235,26 @@ def logout():
 def labels_for(annotator_id: int) -> dict[str, str]:
     with engine.connect() as conn:
         result = conn.execute(
-            text("SELECT row_id, label FROM annotations WHERE annotator_id = :a"),
+            text("SELECT item_id, label FROM annotations WHERE annotator_id = :a"),
             {"a": annotator_id},
         )
-        return {row_id: label for row_id, label in result}
+        return {item_id: label for item_id, label in result}
 
 
-def save_label(annotator_id: int, row_id: str, label: str) -> None:
+def save_label(annotator_id: int, item_id: str, label: str) -> None:
     with engine.begin() as conn:
         conn.execute(
             text(
                 """
-                INSERT INTO annotations (annotator_id, row_id, label, updated_at)
+                INSERT INTO annotations (annotator_id, item_id, label, updated_at)
                 VALUES (:a, :r, :l, :t)
-                ON CONFLICT (annotator_id, row_id)
+                ON CONFLICT (annotator_id, item_id)
                 DO UPDATE SET label = excluded.label, updated_at = excluded.updated_at
                 """
             ),
             {
                 "a": annotator_id,
-                "r": row_id,
+                "r": item_id,
                 "l": label,
                 "t": datetime.now(timezone.utc),
             },
@@ -265,7 +283,7 @@ def index():
     if idx is None:
         # Jump to the first row this annotator has not labeled yet.
         idx = next(
-            (i for i, r in enumerate(ROWS) if r["row_id"] not in done_labels),
+            (i for i, r in enumerate(ROWS) if r["item_id"] not in done_labels),
             None,
         )
         if idx is None:
@@ -282,7 +300,7 @@ def index():
         done=False,
         annotator_id=annotator_id,
         tweet=row,
-        current_label=done_labels.get(row["row_id"], ""),
+        current_label=done_labels.get(row["item_id"], ""),
         labels=LABELS,
         current_idx=idx,
         prev_idx=idx - 1 if idx > 0 else None,
@@ -298,16 +316,16 @@ def index():
 @app.route("/rate", methods=["POST"])
 @login_required
 def rate():
-    row_id = (request.form.get("row_id") or "").strip()
+    item_id = (request.form.get("item_id") or "").strip()
     label = request.form.get("label")
     current_idx = request.form.get("current_idx", type=int, default=0)
 
     if label not in VALID_LABELS:
         return "Invalid label", 400
-    if row_id not in ROW_INDEX:
-        return "Unknown row", 404
+    if item_id not in ROW_INDEX:
+        return "Unknown item", 404
 
-    save_label(g.annotator_id, row_id, label)
+    save_label(g.annotator_id, item_id, label)
 
     next_idx = current_idx + 1
     if next_idx >= TOTAL:
@@ -342,8 +360,19 @@ def admin():
         }
         for a in ANNOTATOR_IDS
     ]
+
+    # Labels whose sentence is no longer in the CSV — the signal that a
+    # regenerated dataset dropped or altered rows people had already judged.
+    with engine.connect() as conn:
+        stored = conn.execute(text("SELECT DISTINCT item_id FROM annotations")).scalars().all()
+    orphans = sorted(set(stored) - set(ROW_INDEX))
+
     return render_template(
-        "admin.html", stats=stats, total=TOTAL, token=request.args.get("token", "")
+        "admin.html",
+        stats=stats,
+        total=TOTAL,
+        orphans=orphans,
+        token=request.args.get("token", ""),
     )
 
 
@@ -355,6 +384,7 @@ def export_csv():
 
     def generate():
         header = [
+            "item_id",
             "row_id",
             "handle",
             "created_at",
@@ -367,14 +397,15 @@ def export_csv():
         yield ",".join(header) + "\n"
         for row in ROWS:
             values = [
+                row["item_id"],
                 row["row_id"],
                 row["handle"],
                 row["created_at"],
                 row["url"],
                 row["text"],
-                per_annotator[1].get(row["row_id"], ""),
-                per_annotator[2].get(row["row_id"], ""),
-                per_annotator[3].get(row["row_id"], ""),
+                per_annotator[1].get(row["item_id"], ""),
+                per_annotator[2].get(row["item_id"], ""),
+                per_annotator[3].get(row["item_id"], ""),
             ]
             yield ",".join('"' + str(v).replace('"', '""') + '"' for v in values) + "\n"
 
