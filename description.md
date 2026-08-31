@@ -52,6 +52,10 @@ Payment is conditional on finishing. An annotator who stops before labelling eve
 sentence is not paid for the sentences they did label. This must be stated to each
 annotator before they begin, not at the point they want to stop.
 
+Genuine emergencies are the exception. Illness, a family emergency or anything else
+outside the annotator's control is handled personally by the project lead, case by
+case. Annotators should be told to raise it directly rather than simply stopping.
+
 The total is then whichever of these two is **higher at the time of completion**:
 
 - **Rs 15,000**, or
@@ -72,6 +76,30 @@ weakens over the course of the work. Which arm applies depends on the rate on th
 Payment is per annotator, so three annotators completing the full corpus costs
 Rs 45,000 in total, or the dollar equivalent if that is higher.
 
+### Quality check
+
+Payment is also conditional on the work passing a check once all three annotators have
+finished. The three sets of answers are compared against each other, and an annotator
+whose work fails the check is not paid.
+
+The check is aimed at work that does not represent genuine judgement — labels diverging
+from both other annotators far beyond the normal range, long runs of a single label,
+or a completion pace that leaves no time to have read the sentences.
+
+Ordinary disagreement is not a failure. Three people will not agree on every sentence,
+and measuring how often they do is the entire reason three annotators are used. An
+annotator who is simply stricter than the others — reaching for Strongly Negative where
+they reach for Negative — is internally consistent, statistically correctable, and has
+done the job properly.
+
+The threshold that separates the two must be fixed and communicated **before** work
+begins. Deciding after the fact what counts as "too far off" is both unfair to the
+annotator and, because they cannot know what they are being held to, unenforceable in
+practice. It also creates the incentive this rule most needs to avoid: if diverging from
+the majority is what costs an annotator their payment, the safe strategy is to guess
+what the other two would say rather than record an honest judgement — which destroys the
+independence the dataset depends on.
+
 ### Worked examples
 
 - Annotator labels all 15,000 sentences → 15,000 × Rs 1 = Rs 15,000, then compared
@@ -80,10 +108,18 @@ Rs 45,000 in total, or the dollar equivalent if that is higher.
   completion, not per sentence delivered, so partial work earns nothing.
 - Corpus ends up at 16,000 sentences and the annotator labels all of them → payment
   is capped at 15,000 annotations, so Rs 15,000, compared against USD 100 as above.
+- Annotator finishes all 15,000 but the work fails the quality check → **no payment**,
+  on the same basis as not finishing.
 
-`Don't know` responses count as annotations and are paid the same as any other label.
-They are a real judgement about the sentence, and paying less for them would create a
-reason to guess.
+`Don't know` responses count as annotations and are paid exactly the same as any other
+label. They are a real judgement about the sentence, and paying less for them would
+create a reason to guess.
+
+That said, the sentences have been filtered and prepared so that the large majority are
+judgeable by a native speaker. `Don't know` is there for the genuinely ambiguous
+fragment, and should be a small share of an annotator's answers rather than a routine
+escape. If someone is reaching for it constantly, something is wrong with the data or
+with their understanding of the task, and it is worth catching early.
 
 ## Points to confirm before work begins
 
@@ -94,13 +130,14 @@ all three annotators:
    rate for the completion date is the obvious neutral choice.
 2. **What "completion" means** — the date the annotator finishes their last sentence,
    or the date all three finish. These can differ by weeks.
-3. **What counts as finishing**, given that payment is all-or-nothing. Whether an
-   annotator who reaches the end with some sentences left on `Don't know` has
-   completed the set, and whether illness or a family emergency partway through is
-   handled differently from simply stopping.
-4. **What happens if the corpus grows after someone finishes** — whether they are
+3. **What counts as finishing**, given that payment is all-or-nothing — in particular
+   whether an annotator who reaches the end with some sentences left on `Don't know`
+   has completed the set.
+4. **The quality-check threshold**, stated concretely enough that an annotator knows
+   what they are being held to before they start, and agreed with all three of them.
+5. **What happens if the corpus grows after someone finishes** — whether they are
    asked to label the new sentences, and whether that is paid beyond the 15,000 cap.
-5. **Payment timing and method.**
+6. **Payment timing and method.**
 
 ## Data handling
 
