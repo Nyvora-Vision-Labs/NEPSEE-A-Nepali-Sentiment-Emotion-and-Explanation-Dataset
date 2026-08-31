@@ -45,7 +45,12 @@ The corpus currently holds **12,282 sentences** and is expected to grow to rough
 
 ## Payment
 
-**Rs 1 per annotation**, up to a maximum of **15,000 annotations**, paid per annotator.
+**Rs 1 per annotation**, up to a maximum of **15,000 annotations**, paid per annotator,
+**on completion of the full set**.
+
+Payment is conditional on finishing. An annotator who stops before labelling every
+sentence is not paid for the sentences they did label. This must be stated to each
+annotator before they begin, not at the point they want to stop.
 
 The total is then whichever of these two is **higher at the time of completion**:
 
@@ -71,8 +76,8 @@ Rs 45,000 in total, or the dollar equivalent if that is higher.
 
 - Annotator labels all 15,000 sentences → 15,000 × Rs 1 = Rs 15,000, then compared
   against USD 100 and the higher amount is paid.
-- Annotator labels 9,000 sentences → 9,000 × Rs 1 = **Rs 9,000**. The floor and cap
-  apply to the completed maximum, not to partial work.
+- Annotator labels 9,000 sentences and stops → **no payment**. The work is paid on
+  completion, not per sentence delivered, so partial work earns nothing.
 - Corpus ends up at 16,000 sentences and the annotator labels all of them → payment
   is capped at 15,000 annotations, so Rs 15,000, compared against USD 100 as above.
 
@@ -89,8 +94,10 @@ all three annotators:
    rate for the completion date is the obvious neutral choice.
 2. **What "completion" means** — the date the annotator finishes their last sentence,
    or the date all three finish. These can differ by weeks.
-3. **What happens if an annotator stops partway.** The examples above assume pro-rata
-   payment at Rs 1 per completed annotation, with no minimum.
+3. **What counts as finishing**, given that payment is all-or-nothing. Whether an
+   annotator who reaches the end with some sentences left on `Don't know` has
+   completed the set, and whether illness or a family emergency partway through is
+   handled differently from simply stopping.
 4. **What happens if the corpus grows after someone finishes** — whether they are
    asked to label the new sentences, and whether that is paid beyond the 15,000 cap.
 5. **Payment timing and method.**
