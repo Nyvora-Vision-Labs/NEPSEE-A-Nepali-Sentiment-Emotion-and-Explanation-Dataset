@@ -115,6 +115,9 @@ phone.
 - **Full overlap by design.** All three label all 12,282 sentences, which is what makes
   inter-annotator agreement computable across the whole dataset rather than a sample.
 
+The task definition given to annotators — label definitions, independence requirement
+and payment terms — is in [`description.md`](description.md).
+
 **Monitoring and export** — both guarded by `ADMIN_TOKEN`:
 
 - `/admin?token=…` — progress for all three annotators.
@@ -143,6 +146,7 @@ phone.
 │   ├── account_details.md  Source accounts, categories, selection rationale
 │   ├── data_filter.md      Filtering pipeline with per-stage counts
 │   └── limitations.md      (empty — see Limitations below)
+├── description.md          Annotation task definition and compensation terms
 ├── render.yaml             Render deployment blueprint
 ├── requirements.txt
 └── DEPLOY.md               Hosting walkthrough (Render + Neon)
