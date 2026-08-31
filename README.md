@@ -18,13 +18,13 @@ _explanation_ layers named in the project title are planned but not yet built.
 | ----------------------------- | --------------------------------------------------------------- |
 | Source accounts               | 20 (9 politicians, 9 journalists, 2 activists)                  |
 | Raw tweets scraped            | 9,931                                                           |
-| Nepali tweets after filtering | 6,824                                                           |
-| Sentence rows for annotation  | **12,282**                                                      |
-| Nepali word tokens            | ~160,600                                                        |
+| Nepali tweets after filtering | 6,824 (6,661 with a sentence surviving the length filter)        |
+| Sentence rows for annotation  | **10,947**                                                      |
+| Nepali word tokens            | ~156,700                                                        |
 | Date range                    | Dec 2017 – Aug 2026                                             |
 | Sentences per tweet           | 1.80 average, 9 maximum; 45% of tweets split into more than one |
-| Words per sentence            | 13.1 mean, 11 median                                            |
-| Annotators                    | 3, each labelling all 12,282 sentences independently            |
+| Words per sentence            | 14.3 mean, 12 median; 5 minimum                                  |
+| Annotators                    | 3, each labelling all 10,947 sentences independently            |
 | Label set                     | 5-point sentiment scale + `dont_know`                           |
 
 ---
@@ -72,6 +72,10 @@ followed by whitespace, and on newlines, expanding 6,824 tweets into 12,282 sent
 rows. Every row gets a stable `row_id`; `tweet_id` points back to the source tweet and
 `sentence_index` gives its position within it.
 
+Splitting re-introduces fragments that the tweet-level length filter had let through, so
+a second pass drops any sentence shorter than five words — 1,335 rows such as greetings
+and bare names, leaving **10,947 sentences from 6,661 tweets**.
+
 The script backs up to `data/filtered_data_backup.csv` first and is idempotent — it
 detects the `row_id`/`tweet_id` columns and skips if it has already run.
 
@@ -114,7 +118,7 @@ phone.
 - **Mobile-first.** Single-column buttons with 52px tap targets, verified at a 390px
   viewport. Keys 1–6 and arrow keys work on desktop. Sessions last 60 days, so
   annotators sign in once.
-- **Full overlap by design.** All three label all 12,282 sentences, which is what makes
+- **Full overlap by design.** All three label all 10,947 sentences, which is what makes
   inter-annotator agreement computable across the whole dataset rather than a sample.
 
 The task definition given to annotators — label definitions, independence requirement,
@@ -142,11 +146,12 @@ it deploys with the app.
 │   └── admin.html          Progress dashboard
 ├── scrape.py               Tweet collection via Twikit
 ├── split_sentences.py      Tweet → sentence expansion (one-time migration)
+├── drop_short_sentences.py Removes sentences shorter than 5 words
 ├── analyze.ipynb           Filtering pipeline and corpus statistics
 ├── data/
 │   ├── accounts.json       The 20 source accounts
 │   ├── tweets.json/.csv    Raw scrape output (9,931 tweets)
-│   ├── filtered_data.csv   Annotation corpus (12,282 sentence rows)
+│   ├── filtered_data.csv   Annotation corpus (10,947 sentence rows)
 │   └── filtered_data_backup.csv   Pre-segmentation snapshot
 ├── reports/
 │   ├── account_details.md  Source accounts, categories, selection rationale

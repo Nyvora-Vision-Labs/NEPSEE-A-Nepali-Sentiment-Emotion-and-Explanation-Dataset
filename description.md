@@ -40,13 +40,17 @@ off, on any device. You can also go back and change an earlier answer.
 
 ## Scope
 
-The corpus currently holds **12,282 sentences** and is expected to grow to roughly
-**15,000** before annotation begins. Each annotator labels all of them.
+The corpus currently holds **10,947 sentences** — down from 12,282 after sentence
+fragments of fewer than five words were removed — and may grow modestly with further
+scraping before annotation begins. Each annotator labels all of them.
 
 ## Payment
 
-**Rs 1 per annotation**, up to a maximum of **15,000 annotations**, paid per annotator,
+**Rs 1 per annotation**, up to a maximum of **11,000 annotations**, paid per annotator,
 **on completion of the full set**.
+
+> **Maximum payable per annotator: Rs 11,000, or USD 65, whichever is higher at the
+> time of payment.** This is the ceiling regardless of how large the corpus becomes.
 
 Payment is conditional on finishing. An annotator who stops before labelling every
 sentence is not paid for the sentences they did label. This must be stated to each
@@ -58,23 +62,26 @@ case. Annotators should be told to raise it directly rather than simply stopping
 
 The total is then whichever of these two is **higher at the time of completion**:
 
-- **Rs 15,000**, or
-- **USD 100**, converted to Nepali rupees at the exchange rate on the completion date.
+- **Rs 11,000**, or
+- **USD 65**, converted to Nepali rupees at the exchange rate on the completion date.
 
 The second arm exists so that the value of the payment does not fall if the rupee
 weakens over the course of the work. Which arm applies depends on the rate on the day:
 
-| NPR per USD on completion date | USD 100 equals | Amount paid |
+| NPR per USD on completion date | USD 65 equals | Amount paid |
 |---|---|---|
-| 135 | Rs 13,500 | **Rs 15,000** (rupee amount is higher) |
-| 145 | Rs 14,500 | **Rs 15,000** (rupee amount is higher) |
-| 150 | Rs 15,000 | Rs 15,000 (equal) |
-| 160 | Rs 16,000 | **Rs 16,000** (dollar amount is higher) |
+| 140 | Rs 9,100 | **Rs 11,000** (rupee amount is higher) |
+| 160 | Rs 10,400 | **Rs 11,000** (rupee amount is higher) |
+| 170 | Rs 11,050 | **Rs 11,050** (dollar amount is higher) |
+| 185 | Rs 12,025 | **Rs 12,025** (dollar amount is higher) |
+
+The two arms cross at roughly **NPR 169 per USD** — below that the rupee figure governs,
+above it the dollar figure does.
 
 *Illustrative only — the actual rate on the completion date governs.*
 
 Payment is per annotator, so three annotators completing the full corpus costs
-Rs 45,000 in total, or the dollar equivalent if that is higher.
+Rs 33,000 in total, or the dollar equivalent if that is higher.
 
 ### Quality check
 
@@ -102,13 +109,13 @@ independence the dataset depends on.
 
 ### Worked examples
 
-- Annotator labels all 15,000 sentences → 15,000 × Rs 1 = Rs 15,000, then compared
-  against USD 100 and the higher amount is paid.
+- Annotator labels all 10,947 sentences → 10,947 × Rs 1 = Rs 10,947, then compared
+  against USD 65 and the higher amount is paid.
 - Annotator labels 9,000 sentences and stops → **no payment**. The work is paid on
   completion, not per sentence delivered, so partial work earns nothing.
-- Corpus ends up at 16,000 sentences and the annotator labels all of them → payment
-  is capped at 15,000 annotations, so Rs 15,000, compared against USD 100 as above.
-- Annotator finishes all 15,000 but the work fails the quality check → **no payment**,
+- Corpus ends up at 13,000 sentences and the annotator labels all of them → payment
+  is capped at 11,000 annotations, so Rs 11,000, compared against USD 65 as above.
+- Annotator finishes the full set but the work fails the quality check → **no payment**,
   on the same basis as not finishing.
 
 `Don't know` responses count as annotations and are paid exactly the same as any other
@@ -136,7 +143,7 @@ all three annotators:
 4. **The quality-check threshold**, stated concretely enough that an annotator knows
    what they are being held to before they start, and agreed with all three of them.
 5. **What happens if the corpus grows after someone finishes** — whether they are
-   asked to label the new sentences, and whether that is paid beyond the 15,000 cap.
+   asked to label the new sentences, and whether that is paid beyond the 11,000 cap.
 6. **Payment timing and method.**
 
 ## Data handling
