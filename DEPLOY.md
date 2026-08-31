@@ -44,6 +44,10 @@ The `annotations` table is created automatically the first time the app starts.
 
 ## 3. Give it to the annotators
 
+Send them `https://your-app.onrender.com/brief` first — the task, the rules and the
+payment terms, readable without signing in. Then send each person their own number and
+password separately.
+
 Send each person the URL plus **their own number and password only**. They open
 it on their phone, tap their number, type the password, and start labelling.
 The login lasts 60 days, so they sign in once.

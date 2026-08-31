@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#E9E6DC">
+<title>NEPSEE Annotator Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Devanagari:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+  :root {
+    --ground:    #E9E6DC;
+    --surface:   #FFFFFF;
+    --sunk:      #F2F0E8;
+    --ink:       #22252B;
+    --muted:     #6E6D64;
+    --rule:      #DAD6C8;
+    --rule-soft: #E4E0D4;
+    --accent:    #7A1F2B;
+    --accent-ink:#FFFFFF;
+
+    --sp:  #1B6B41;  --sp-bg: #D9EDE1;
+    --p:   #3F8E62;  --p-bg:  #E7F2EB;
+    --n:   #5B5A52;  --n-bg:  #EAE9E3;
+    --ng:  #B25742;  --ng-bg: #F6E8E3;
+    --sng: #8C2718;  --sng-bg:#F3DED8;
+    --dk:  #8B6F2E;  --dk-bg: #F1EBDD;
+
+    --shadow: 0 1px 2px rgba(34,37,43,.05), 0 6px 20px rgba(34,37,43,.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:    #1B1D19;
+      --surface:   #24261F;
+      --sunk:      #1F2119;
+      --ink:       #E9E6DC;
+      --muted:     #9C9A8D;
+      --rule:      #3A3C33;
+      --rule-soft: #303229;
+      --accent:    #D98E97;
+      --accent-ink:#22252B;
+      --sp:  #6FC894;  --sp-bg: #17301F;
+      --p:   #8FD3AE;  --p-bg:  #16291D;
+      --n:   #ADAB9E;  --n-bg:  #26271F;
+      --ng:  #E39F8A;  --ng-bg: #301E19;
+      --sng: #EC8E7B;  --sng-bg:#331913;
+      --dk:  #D9BC77;  --dk-bg: #2C2618;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:    #1B1D19;
+    --surface:   #24261F;
+    --sunk:      #1F2119;
+    --ink:       #E9E6DC;
+    --muted:     #9C9A8D;
+    --rule:      #3A3C33;
+    --rule-soft: #303229;
+    --accent:    #D98E97;
+    --accent-ink:#22252B;
+    --sp:  #6FC894;  --sp-bg: #17301F;
+    --p:   #8FD3AE;  --p-bg:  #16291D;
+    --n:   #ADAB9E;  --n-bg:  #26271F;
+    --ng:  #E39F8A;  --ng-bg: #301E19;
+    --sng: #EC8E7B;  --sng-bg:#331913;
+    --dk:  #D9BC77;  --dk-bg: #2C2618;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 16.5px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 40px 20px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  h1 {
+    font-size: clamp(29px, 7.2vw, 40px);
+    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    text-wrap: balance;
+    margin: 10px 0 0;
+  }
+  h1 .thin { font-weight: 400; color: var(--muted); }
+
+  h2 {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  h3 {
+    font-size: 15.5px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  p { margin: 0; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  .lede { font-size: 18px; color: var(--muted); text-wrap: pretty; }
+
+  /* ── header ───────────────────────────────────────── */
+  header { border-bottom: 2px solid var(--accent); padding-bottom: 26px; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .fact {
+    flex: 1 1 150px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    padding: 12px 14px;
+  }
+  .fact .k {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+  }
+  .fact .v {
+    font-size: 19px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-top: 3px;
+    display: block;
+  }
+
+  /* ── sections ─────────────────────────────────────── */
+  section { display: flex; flex-direction: column; gap: 16px; }
+  section > .eyebrow { margin-bottom: -6px; }
+
+  /* ── the scale ────────────────────────────────────── */
+  .ramp {
+    display: flex;
+    height: 7px;
+    border-radius: 4px;
+    overflow: hidden;
+    gap: 2px;
+  }
+  .ramp span { flex: 1; }
+
+  .scale { display: flex; flex-direction: column; gap: 7px; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 12px;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 5px solid var(--c);
+    border-radius: 9px;
+    padding: 13px 15px;
+  }
+  .row .num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--c);
+    background: var(--cbg);
+    border-radius: 5px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .row .names {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+  }
+  .row .en { font-weight: 600; font-size: 16px; color: var(--c); }
+  .row .np {
+    font-family: "IBM Plex Sans Devanagari", "Nirmala UI", sans-serif;
+    font-size: 14.5px;
+    color: var(--muted);
+  }
+  .row .when {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-top: 3px;
+    line-height: 1.55;
+  }
+
+  /* ── rule blocks ──────────────────────────────────── */
+  .rules { display: flex; flex-direction: column; gap: 12px; }
+  .rule {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rule p { font-size: 15px; color: var(--muted); }
+  .rule.flag { border-color: var(--accent); background: var(--sunk); }
+  .rule.flag h3 { color: var(--accent); }
+
+  /* ── example ──────────────────────────────────────── */
+  .example {
+    background: var(--sunk);
+    border: 1px solid var(--rule-soft);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .example .np-text {
+    font-family: "IBM Plex Sans Devanagari", "Nirmala UI", sans-serif;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+  .example .verdict { font-size: 14.5px; color: var(--muted); }
+  .example .verdict b { color: var(--ink); font-weight: 600; }
+
+  /* ── payment ──────────────────────────────────────── */
+  .pay {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .rate {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .rate .big {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .rate .per { font-size: 15px; color: var(--muted); }
+
+  .formula { display: flex; flex-direction: column; gap: 9px; }
+  .arm {
+    display: flex;
+    align-items: baseline;
+    gap: 11px;
+    font-size: 15.5px;
+  }
+  .arm .amt {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    background: var(--sunk);
+    border: 1px solid var(--rule-soft);
+    border-radius: 6px;
+    padding: 3px 9px;
+    white-space: nowrap;
+  }
+  .arm .txt { color: var(--muted); font-size: 14.5px; }
+  .orbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .orbar::before, .orbar::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule-soft);
+  }
+
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  caption {
+    caption-side: bottom;
+    text-align: left;
+    white-space: normal;
+    font-size: 12.5px;
+    color: var(--muted);
+    padding-top: 10px;
+    font-style: italic;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 10px 9px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    white-space: nowrap;
+  }
+  th:last-child, td:last-child { padding-right: 0; }
+  th {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  td { font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+  td.win { font-weight: 600; color: var(--accent); }
+
+  /* ── list ─────────────────────────────────────────── */
+  ol.checks {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: c;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  ol.checks li {
+    counter-increment: c;
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 12px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  ol.checks li::before {
+    content: counter(c);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--accent);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  ol.checks b { color: var(--ink); font-weight: 600; }
+
+  .start {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 12px 22px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: 9px;
+    font-size: 15.5px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .start:active { transform: scale(.99); }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 20px;
+    font-size: 13.5px;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  @media (max-width: 420px) {
+    .page { padding: 32px 16px 72px; gap: 38px; }
+    .rate .big { font-size: 34px; }
+  }
+</style>
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header>
+    <div class="eyebrow">NEPSEE · Annotator brief</div>
+    <h1>Judging sentiment,<br><span class="thin">one sentence at a time.</span></h1>
+    <p class="lede" style="margin-top:14px;">
+      You will read short Nepali sentences taken from tweets by public figures, and
+      record the sentiment each one expresses. This page explains the task, the rules
+      that make the results usable, and what you are paid. Payment depends on
+      finishing the whole set and on your work passing a check at the end — read that
+      section before you agree to take this on.
+    </p>
+
+    <div class="facts">
+      <div class="fact"><span class="k">Sentences</span><span class="v">~15,000</span></div>
+      <div class="fact"><span class="k">Annotators</span><span class="v">3, independent</span></div>
+      <div class="fact"><span class="k">Rate</span><span class="v">Rs 1 each</span></div>
+      <div class="fact"><span class="k">Paid</span><span class="v">On completion</span></div>
+    </div>
+  </header>
+
+  <section>
+    <div class="eyebrow">The task</div>
+    <h2>Record the sentiment the writer is expressing</h2>
+    <p>
+      Each sentence comes from a tweet by one of 20 Nepali politicians, journalists or
+      activists, writing about politics, governance and current affairs. You read one
+      sentence and choose one of six answers. That is the whole job.
+    </p>
+    <p>
+      Judge the sentiment <b>expressed in the sentence</b> — not whether you agree with
+      it, and not whether the underlying event is good or bad news. A sentence can
+      report a terrible event in flat, factual language. That sentence is neutral.
+    </p>
+
+    <div class="example">
+      <div class="eyebrow">For example</div>
+      <p class="np-text">भूकम्पमा परी तीन जनाको मृत्यु भएको छ ।</p>
+      <p class="verdict">
+        Terrible news, stated as plain reporting with no evaluative language.
+        The answer is <b>Neutral</b>, not Strongly Negative.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">The scale</div>
+    <h2>Six answers</h2>
+    <p>
+      Five points running from most positive to most negative, plus an answer for
+      sentences you cannot judge. On a computer, keys <b>1</b> to <b>6</b> select them
+      in this order.
+    </p>
+
+    <div class="ramp" aria-hidden="true">
+      <span style="background:var(--sp)"></span>
+      <span style="background:var(--p)"></span>
+      <span style="background:var(--n)"></span>
+      <span style="background:var(--ng)"></span>
+      <span style="background:var(--sng)"></span>
+    </div>
+
+    <div class="scale">
+      <div class="row" style="--c:var(--sp); --cbg:var(--sp-bg)">
+        <span class="num">1</span>
+        <div>
+          <div class="names"><span class="en">Strongly Positive</span><span class="np">अति सकारात्मक</span></div>
+          <div class="when">Emphatic praise, celebration, strong approval.</div>
+        </div>
+      </div>
+      <div class="row" style="--c:var(--p); --cbg:var(--p-bg)">
+        <span class="num">2</span>
+        <div>
+          <div class="names"><span class="en">Positive</span><span class="np">सकारात्मक</span></div>
+          <div class="when">Mild approval, optimism, good news stated plainly.</div>
+        </div>
+      </div>
+      <div class="row" style="--c:var(--n); --cbg:var(--n-bg)">
+        <span class="num">3</span>
+        <div>
+          <div class="names"><span class="en">Neutral</span><span class="np">तटस्थ</span></div>
+          <div class="when">Factual statement, announcement, no evident stance.</div>
+        </div>
+      </div>
+      <div class="row" style="--c:var(--ng); --cbg:var(--ng-bg)">
+        <span class="num">4</span>
+        <div>
+          <div class="names"><span class="en">Negative</span><span class="np">नकारात्मक</span></div>
+          <div class="when">Mild criticism, disappointment, concern.</div>
+        </div>
+      </div>
+      <div class="row" style="--c:var(--sng); --cbg:var(--sng-bg)">
+        <span class="num">5</span>
+        <div>
+          <div class="names"><span class="en">Strongly Negative</span><span class="np">अति नकारात्मक</span></div>
+          <div class="when">Emphatic condemnation, anger, accusation.</div>
+        </div>
+      </div>
+      <div class="row" style="--c:var(--dk); --cbg:var(--dk-bg)">
+        <span class="num">6</span>
+        <div>
+          <div class="names"><span class="en">Don't know</span><span class="np">थाहा छैन</span></div>
+          <div class="when">Too short, ambiguous, or lacking context to judge.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Rules that matter</div>
+    <h2>Three things that decide whether the data is usable</h2>
+
+    <div class="rules">
+      <div class="rule flag">
+        <h3>Do not discuss sentences with the other annotators</h3>
+        <p>
+          Not while the work is running — not to check a hard one, not to settle a
+          disagreement. The value of this dataset comes from three genuinely independent
+          judgements per sentence. How often you agree is the measurement. It stops being
+          a measurement the moment the answers influence each other.
+        </p>
+      </div>
+
+      <div class="rule">
+        <h3>“Don't know” is a real answer, not a failure</h3>
+        <p>
+          Sentences are split at the danda (।), so some arrive as fragments of two or
+          three words that genuinely cannot be judged alone. Choose Don't know rather
+          than guessing. A guessed label is worse for the dataset than no label, and
+          Don't know is paid exactly the same as any other answer.
+        </p>
+        <p>
+          It should still be uncommon. The sentences were filtered and prepared so that
+          the large majority are judgeable by a native speaker, so expect to reach for
+          this occasionally, not routinely. If you find yourself using it constantly,
+          stop and tell the coordinator — something is wrong that is worth fixing early.
+        </p>
+      </div>
+
+      <div class="rule">
+        <h3>Trust your first reading</h3>
+        <p>
+          These are ordinary sentences read by a native speaker, not puzzles. If a
+          sentence needs a minute of analysis, that is usually a sign it belongs in
+          Don't know.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Working</div>
+    <h2>How it runs</h2>
+    <p>
+      You will be given a web address, your annotator number (1, 2 or 3) and a password.
+      It works on a phone — add it to your home screen and it opens like an app.
+    </p>
+    <div class="rules">
+      <div class="rule">
+        <h3>Everything saves as you tap</h3>
+        <p>
+          Each answer is recorded the moment you choose it. Stop whenever you like and
+          reopen later, on any device, and you resume at your next unanswered sentence.
+        </p>
+      </div>
+      <div class="rule">
+        <h3>You can go back and change an answer</h3>
+        <p>
+          Use Back and Next to move between sentences. Choosing a different answer
+          replaces the old one. You sign in once — the session lasts 60 days.
+        </p>
+      </div>
+      <div class="rule">
+        <h3>The first load of the day is slow</h3>
+        <p>
+          The server sleeps when nobody is using it and takes up to a minute to wake.
+          That is normal, not a fault. Everything after that is immediate.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Checking</div>
+    <h2>Your work is compared with the other two</h2>
+    <p>
+      Once all three of you have finished, the three sets of answers are compared. This
+      is partly the point of the research — how often independent readers agree is the
+      thing being measured — and partly a check that the work was done properly.
+    </p>
+
+    <div class="rules">
+      <div class="rule flag">
+        <h3>Work that fails the check is not paid</h3>
+        <p>
+          An annotator whose answers diverge from both of the others far beyond the
+          normal range, or show long runs of a single label, or arrive faster than the
+          sentences could have been read, is not paid at all. Ask the coordinator what
+          the threshold is before you start — you are entitled to know what you are
+          being held to.
+        </p>
+      </div>
+
+      <div class="rule">
+        <h3>Disagreeing with the others is not failing</h3>
+        <p>
+          Three people will not agree on every sentence, and nobody expects them to.
+          Being consistently a little stricter than the others — Strongly Negative where
+          they say Negative — is a normal, usable pattern, not a problem. What the check
+          looks for is answers that do not look like reading at all.
+        </p>
+      </div>
+
+      <div class="rule">
+        <h3>Do not try to guess what the others would say</h3>
+        <p>
+          It is the wrong strategy and it damages the dataset. Your own honest reading is
+          what is being collected. Matching an imagined majority produces worse work than
+          simply answering as you see it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Payment</div>
+    <h2>What you are paid</h2>
+
+    <div class="pay">
+      <div class="rate">
+        <span class="big">Rs 1</span>
+        <span class="per">per sentence, up to 15,000 — paid when the full set is done and checked</span>
+      </div>
+
+      <div class="formula">
+        <p style="font-size:15px;color:var(--muted);">
+          On completing the full set, you are paid whichever of these is
+          <b style="color:var(--ink);">higher on the day you finish</b>:
+        </p>
+        <div class="arm">
+          <span class="amt">Rs 15,000</span>
+          <span class="txt">15,000 answers at Rs 1 each</span>
+        </div>
+        <div class="orbar">or</div>
+        <div class="arm">
+          <span class="amt">USD 100</span>
+          <span class="txt">converted to rupees at the rate on your completion date</span>
+        </div>
+      </div>
+
+      <div class="tablewrap">
+        <table>
+          <caption>Illustrative rates. The actual rate on your completion date governs.</caption>
+          <thead>
+            <tr><th>NPR / USD</th><th>USD 100 =</th><th>You are paid</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>135</td><td>Rs 13,500</td><td class="win">Rs 15,000</td></tr>
+            <tr><td>145</td><td>Rs 14,500</td><td class="win">Rs 15,000</td></tr>
+            <tr><td>150</td><td>Rs 15,000</td><td>Rs 15,000</td></tr>
+            <tr><td>160</td><td>Rs 16,000</td><td class="win">Rs 16,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="font-size:14.5px;color:var(--muted);">
+        The dollar figure is a floor, not a bonus. It exists so the value of your payment
+        does not fall if the rupee weakens while you are working.
+      </p>
+    </div>
+
+    <div class="rules">
+      <div class="rule flag">
+        <h3>This is paid on completion, not per sentence</h3>
+        <p>
+          If you stop before the set is finished, there is no payment for the sentences
+          you did answer. Someone who answers 9,000 and stops is paid nothing. Please
+          take this seriously before you start: 15,000 sentences is real work spread over
+          weeks, and the whole amount depends on reaching the end of it.
+        </p>
+      </div>
+      <div class="rule">
+        <h3>If something happens that is outside your control</h3>
+        <p>
+          Illness, a family emergency, anything genuinely unforeseen — that is not the
+          same as choosing to stop, and it is not handled by a rule. Contact the project
+          lead directly and it will be sorted out personally, case by case. Raise it
+          rather than going quiet.
+        </p>
+      </div>
+
+      <div class="rule">
+        <h3>If the set grows past 15,000</h3>
+        <p>
+          Payment is capped at 15,000 sentences. Anything beyond that would be agreed
+          separately before you are asked to do it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Before you start</div>
+    <h2>Confirm these with the coordinator</h2>
+    <p>
+      These follow from the terms above but are worth having in writing, so that nobody
+      is working from a different assumption at the end.
+    </p>
+    <ol class="checks">
+      <li><span><b>Which exchange rate settles the dollar comparison.</b> Nepal Rastra Bank's published rate for the completion date is the natural neutral choice.</span></li>
+      <li><span><b>What “completion” means</b> — the day you finish your own last sentence, or the day all three of you are done. These can differ by weeks.</span></li>
+      <li><span><b>When and how you are paid</b> after finishing.</span></li>
+      <li><span><b>What the quality-check threshold actually is</b> — concretely enough that you know before you start what would cost you the payment.</span></li>
+      <li><span><b>Whether your labels are published</b> identified by annotator number in the released dataset.</span></li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="eyebrow">Ready</div>
+    <h2>When you have your number and password</h2>
+    <p>
+      <a class="start" href="{{ url_for('login') }}">Sign in and begin &rarr;</a>
+    </p>
+  </section>
+
+  <footer>
+    <p>
+      The sentences are public posts by public figures, collected from X. You see only
+      the sentence and its public metadata; no private or personal data is involved.
+    </p>
+    <p>
+      Your answers are stored with your annotator number and the time you gave them, and
+      are used to measure how often the three of you agree.
+    </p>
+  </footer>
+
+</div>
+
+</body>
+</html>

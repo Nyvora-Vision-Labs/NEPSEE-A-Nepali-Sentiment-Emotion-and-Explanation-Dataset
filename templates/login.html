@@ -57,6 +57,10 @@
       border: none; border-radius: 8px; cursor: pointer;
     }
     button:active { transform: scale(0.99); }
+    .brieflink {
+      margin: 20px 0 0; text-align: center; font-size: 13px; color: var(--muted);
+    }
+    .brieflink a { color: var(--accent); font-weight: 500; }
     .error {
       background: #F4E5E1; color: #A6402E; font-size: 13px; padding: 10px 12px;
       border-radius: 6px; margin-bottom: 18px;
@@ -88,6 +92,10 @@
 
       <button type="submit">Sign in</button>
     </form>
+
+    <p class="brieflink">
+      First time here? <a href="{{ url_for('brief') }}">Read the task and payment terms</a>
+    </p>
   </div>
 </body>
 </html>

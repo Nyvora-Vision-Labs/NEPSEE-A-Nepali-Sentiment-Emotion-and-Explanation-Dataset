@@ -222,6 +222,13 @@ def login():
     return render_template("login.html", error=error)
 
 
+@app.route("/brief")
+def brief():
+    """The annotation task and payment terms. Public: annotators are sent this
+    link before they are given a number and password."""
+    return render_template("brief.html")
+
+
 @app.route("/logout")
 def logout():
     session.clear()

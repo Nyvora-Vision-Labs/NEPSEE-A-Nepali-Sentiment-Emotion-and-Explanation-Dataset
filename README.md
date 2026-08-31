@@ -115,8 +115,11 @@ phone.
 - **Full overlap by design.** All three label all 12,282 sentences, which is what makes
   inter-annotator agreement computable across the whole dataset rather than a sample.
 
-The task definition given to annotators — label definitions, independence requirement
-and payment terms — is in [`description.md`](description.md).
+The task definition given to annotators — label definitions, independence requirement,
+the quality check and payment terms — is in [`description.md`](description.md), and is
+served as a public page at **`/brief`** so annotators can read it before they are given
+credentials. The sign-in screen links to it. Edit `templates/brief.html` to change it;
+it deploys with the app.
 
 **Monitoring and export** — both guarded by `ADMIN_TOKEN`:
 
@@ -131,6 +134,7 @@ and payment terms — is in [`description.md`](description.md).
 ```
 ├── app.py                  Annotation web app (Flask)
 ├── templates/
+│   ├── brief.html          Public task + payment brief, served at /brief
 │   ├── login.html          Annotator sign-in
 │   ├── index.html          Labelling screen
 │   └── admin.html          Progress dashboard
