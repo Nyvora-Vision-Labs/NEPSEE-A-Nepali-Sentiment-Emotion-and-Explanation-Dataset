@@ -1,7 +1,7 @@
 # Deploying the NEPSEE annotation app
 
 Three annotators (1, 2, 3) each sign in with their own number and password and
-label **all 12,282 sentences** independently. Labels are stored per annotator,
+label **all 10,947 sentences** independently. Labels are stored per annotator,
 so you get three parallel judgements per sentence and can compute
 inter-annotator agreement afterwards.
 
