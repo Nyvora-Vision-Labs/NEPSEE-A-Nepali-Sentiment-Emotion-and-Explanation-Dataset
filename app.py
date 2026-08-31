@@ -26,6 +26,13 @@ from flask import (
 )
 from sqlalchemy import create_engine, text
 
+try:  # Local development convenience; on Render the env vars are already set.
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
+
 CSV_PATH = Path(os.environ.get("CSV_PATH", "data/filtered_data.csv"))
 
 # Ordered from most positive to most negative; dont_know sits outside the scale.
@@ -79,7 +86,7 @@ CREATE_TABLE_SQL = """
         annotator_id INTEGER NOT NULL,
         row_id       TEXT    NOT NULL,
         label        TEXT    NOT NULL,
-        updated_at   TIMESTAMP NOT NULL,
+        updated_at   TIMESTAMPTZ NOT NULL,
         PRIMARY KEY (annotator_id, row_id)
     )
 """
