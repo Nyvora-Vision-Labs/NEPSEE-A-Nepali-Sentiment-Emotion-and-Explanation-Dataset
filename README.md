@@ -1,29 +1,31 @@
 # NEPSEE — A Nepali Sentiment, Emotion and Explanation Dataset
 
+https://nepsee-a-nepali-sentiment-emotion-and.onrender.com/brief
+
 A corpus of Nepali-language tweets from public figures in politics, journalism and
 civil society, split into individual sentences and annotated for sentiment by three
 independent annotators.
 
 **Status:** collection, filtering and sentence segmentation are complete. Sentiment
-annotation is in progress via the web app in this repository. The *emotion* and
-*explanation* layers named in the project title are planned but not yet built.
+annotation is in progress via the web app in this repository. The _emotion_ and
+_explanation_ layers named in the project title are planned but not yet built.
 
 ---
 
 ## Dataset at a glance
 
-| | |
-|---|---|
-| Source accounts | 20 (9 politicians, 9 journalists, 2 activists) |
-| Raw tweets scraped | 9,931 |
-| Nepali tweets after filtering | 6,824 |
-| Sentence rows for annotation | **12,282** |
-| Nepali word tokens | ~160,600 |
-| Date range | Dec 2017 – Aug 2026 |
-| Sentences per tweet | 1.80 average, 9 maximum; 45% of tweets split into more than one |
-| Words per sentence | 13.1 mean, 11 median |
-| Annotators | 3, each labelling all 12,282 sentences independently |
-| Label set | 5-point sentiment scale + `dont_know` |
+|                               |                                                                 |
+| ----------------------------- | --------------------------------------------------------------- |
+| Source accounts               | 20 (9 politicians, 9 journalists, 2 activists)                  |
+| Raw tweets scraped            | 9,931                                                           |
+| Nepali tweets after filtering | 6,824                                                           |
+| Sentence rows for annotation  | **12,282**                                                      |
+| Nepali word tokens            | ~160,600                                                        |
+| Date range                    | Dec 2017 – Aug 2026                                             |
+| Sentences per tweet           | 1.80 average, 9 maximum; 45% of tweets split into more than one |
+| Words per sentence            | 13.1 mean, 11 median                                            |
+| Annotators                    | 3, each labelling all 12,282 sentences independently            |
+| Label set                     | 5-point sentiment scale + `dont_know`                           |
 
 ---
 
@@ -87,14 +89,14 @@ phone.
 
 **Label set** — a five-point scale plus an escape hatch:
 
-| Label | English | Nepali |
-|---|---|---|
+| Label               | English           | Nepali        |
+| ------------------- | ----------------- | ------------- |
 | `strongly_positive` | Strongly Positive | अति सकारात्मक |
-| `positive` | Positive | सकारात्मक |
-| `neutral` | Neutral | तटस्थ |
-| `negative` | Negative | नकारात्मक |
+| `positive`          | Positive          | सकारात्मक     |
+| `neutral`           | Neutral           | तटस्थ         |
+| `negative`          | Negative          | नकारात्मक     |
 | `strongly_negative` | Strongly Negative | अति नकारात्मक |
-| `dont_know` | Don't know | थाहा छैन |
+| `dont_know`         | Don't know        | थाहा छैन      |
 
 **Design notes**
 
@@ -158,19 +160,19 @@ it deploys with the app.
 
 ## `data/filtered_data.csv` schema
 
-| Column | Description |
-|---|---|
-| `row_id` | 0-based position in the file. Navigation only — *not* the annotation key |
-| *(derived)* `item_id` | `tweet_id:sentence_index`. **Annotations are keyed on this.** Not a column; computed at load |
-| `handle` | Source account |
-| `id`, `tweet_id` | Original tweet ID |
-| `text` | Original tweet text, unmodified |
-| `text_nepali_only` | Devanagari runs only, English and URLs stripped |
-| `sentence_text` | The single sentence shown to annotators |
-| `sentence_index` | Position of this sentence within its tweet (0-based) |
-| `created_at`, `likes`, `retweets`, `url` | Tweet metadata |
-| `word_count`, `is_valid_nepali_only` | Filtering artefacts |
-| `sentiment` | Legacy single-annotator column, **no longer used or written** |
+| Column                                   | Description                                                                                  |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `row_id`                                 | 0-based position in the file. Navigation only — _not_ the annotation key                     |
+| _(derived)_ `item_id`                    | `tweet_id:sentence_index`. **Annotations are keyed on this.** Not a column; computed at load |
+| `handle`                                 | Source account                                                                               |
+| `id`, `tweet_id`                         | Original tweet ID                                                                            |
+| `text`                                   | Original tweet text, unmodified                                                              |
+| `text_nepali_only`                       | Devanagari runs only, English and URLs stripped                                              |
+| `sentence_text`                          | The single sentence shown to annotators                                                      |
+| `sentence_index`                         | Position of this sentence within its tweet (0-based)                                         |
+| `created_at`, `likes`, `retweets`, `url` | Tweet metadata                                                                               |
+| `word_count`, `is_valid_nepali_only`     | Filtering artefacts                                                                          |
+| `sentiment`                              | Legacy single-annotator column, **no longer used or written**                                |
 
 ### Updating the corpus mid-annotation
 
@@ -214,12 +216,12 @@ Without `DATABASE_URL` set, the app falls back to a local SQLite file
 Hosted on Render with a Neon Postgres database. Full walkthrough in
 [`DEPLOY.md`](DEPLOY.md). Required environment variables:
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | Neon connection string |
-| `ANNOTATOR1_PASSWORD`, `ANNOTATOR2_PASSWORD`, `ANNOTATOR3_PASSWORD` | One per annotator |
-| `ADMIN_TOKEN` | Guards `/admin` and `/export.csv` |
-| `SECRET_KEY` | Session signing; generated by Render. Changing it signs everyone out |
+| Variable                                                            | Purpose                                                              |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `DATABASE_URL`                                                      | Neon connection string                                               |
+| `ANNOTATOR1_PASSWORD`, `ANNOTATOR2_PASSWORD`, `ANNOTATOR3_PASSWORD` | One per annotator                                                    |
+| `ADMIN_TOKEN`                                                       | Guards `/admin` and `/export.csv`                                    |
+| `SECRET_KEY`                                                        | Session signing; generated by Render. Changing it signs everyone out |
 
 Secrets live in `.env`, which is gitignored and must never be committed.
 
@@ -242,7 +244,7 @@ Carried over from the filtering stage (see [`reports/data_filter.md`](reports/da
 From sentence segmentation:
 
 - **Short sentences survive the word filter.** The ≥4-word threshold was applied per
-  *tweet*, before splitting. Segmentation can therefore produce sentence rows as short
+  _tweet_, before splitting. Segmentation can therefore produce sentence rows as short
   as one word, which annotators may find unlabelable — `dont_know` exists partly for
   this.
 - **Danda-based splitting is naive.** It does not handle abbreviations, quoted speech,
@@ -268,11 +270,11 @@ From the corpus itself:
 Full table with roles and selection rationale in
 [`reports/account_details.md`](reports/account_details.md).
 
-| Category | Count |
-|---|---|
-| Politicians & elected officials | 9 |
-| Journalists & media figures | 9 |
-| Activists & social commentators | 2 |
+| Category                        | Count |
+| ------------------------------- | ----- |
+| Politicians & elected officials | 9     |
+| Journalists & media figures     | 9     |
+| Activists & social commentators | 2     |
 
 The politician group spans Nepali Congress, CPN(UML), RSP and the Socialist Party plus
 one independent, chosen to limit partisan skew in the resulting sentiment labels.
