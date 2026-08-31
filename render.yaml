@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: nepsee-annotator
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # One worker keeps the Neon connection pool small; threads handle the
+    # three annotators comfortably.
+    startCommand: gunicorn app:app --workers 1 --threads 8 --timeout 120 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.4"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL          # Neon connection string
+        sync: false
+      - key: ANNOTATOR1_PASSWORD
+        sync: false
+      - key: ANNOTATOR2_PASSWORD
+        sync: false
+      - key: ANNOTATOR3_PASSWORD
+        sync: false
+      - key: ADMIN_TOKEN           # guards /admin and /export.csv
+        sync: false

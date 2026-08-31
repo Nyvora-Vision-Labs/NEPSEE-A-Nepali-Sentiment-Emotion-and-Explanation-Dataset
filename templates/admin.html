@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEPSEE — Annotation progress</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#E9E6DC; --surface:#fff; --ink:#22252B; --muted:#6E6D64; --border:#DAD6C8; --accent:#7A1F2B; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+           font-family:"IBM Plex Sans",sans-serif; display:flex; flex-direction:column;
+           align-items:center; padding:24px 16px; }
+    .wrap { width:100%; max-width:640px; }
+    h1 { font-size:18px; margin:0 0 20px; padding-bottom:12px; border-bottom:2px solid var(--accent); }
+    .row { background:var(--surface); border:1px solid var(--border); border-radius:10px;
+           padding:16px 18px; margin-bottom:10px; }
+    .row-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+    .name { font-weight:600; font-size:15px; }
+    .count { font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--muted); }
+    .count b { color:var(--ink); }
+    .track { height:7px; background:var(--border); border-radius:4px; overflow:hidden; }
+    .fill { height:100%; background:var(--accent); }
+    .dl { display:inline-block; margin-top:16px; padding:12px 20px; background:var(--accent);
+          color:#fff; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>NEPSEE — Annotation progress</h1>
+
+  {% for s in stats %}
+    <div class="row">
+      <div class="row-top">
+        <span class="name">Annotator {{ s.annotator_id }}</span>
+        <span class="count"><b>{{ s.labeled }}</b> / {{ total }} · {{ s.percent }}%</span>
+      </div>
+      <div class="track"><div class="fill" style="width: {{ s.percent }}%;"></div></div>
+    </div>
+  {% endfor %}
+
+  <a class="dl" href="{{ url_for('export_csv', token=token) }}">Download all annotations (CSV)</a>
+</div>
+</body>
+</html>

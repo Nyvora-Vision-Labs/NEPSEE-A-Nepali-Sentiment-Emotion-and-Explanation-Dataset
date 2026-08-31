@@ -16,3 +16,6 @@ venv/
 
 cookies.json
 scrape.py
+
+# Local annotation database (dev only)
+annotations.db

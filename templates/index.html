@@ -2,9 +2,11 @@
 <html lang="ne">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#E9E6DC">
   <title>NEPSEE Sentiment Annotator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Devanagari:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -14,17 +16,16 @@
       --muted: #6E6D64;
       --border: #DAD6C8;
       --accent: #7A1F2B;
-      --positive: #2F7B4F;
-      --positive-bg: #E4EFE7;
-      --neutral: #5B5A52;
-      --neutral-bg: #EAE9E3;
-      --negative: #A6402E;
-      --negative-bg: #F4E5E1;
-      --unsure: #8B6F2E;
-      --unsure-bg: #F1EBDD;
+
+      --strongly_positive: #1B6B41;  --strongly_positive-bg: #D9EDE1;
+      --positive:          #3F8E62;  --positive-bg:          #E7F2EB;
+      --neutral:           #5B5A52;  --neutral-bg:           #EAE9E3;
+      --negative:          #B25742;  --negative-bg:          #F6E8E3;
+      --strongly_negative: #8C2718;  --strongly_negative-bg: #F3DED8;
+      --dont_know:         #8B6F2E;  --dont_know-bg:         #F1EBDD;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
       margin: 0;
@@ -35,267 +36,169 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 16px 48px;
+      padding: 16px 14px calc(32px + env(safe-area-inset-bottom));
     }
+
+    .wrap { width: 100%; max-width: 720px; }
 
     /* ── Top bar ── */
     .topbar {
-      width: 100%;
-      max-width: 760px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 2px 20px;
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 10px; padding-bottom: 12px;
       border-bottom: 2px solid var(--accent);
-      margin-bottom: 24px;
     }
-
-    .brand { font-weight: 600; font-size: 16px; letter-spacing: 0.02em; }
+    .brand { font-weight: 600; font-size: 15px; }
     .brand span { color: var(--accent); }
+    .whoami {
+      font-family: "IBM Plex Mono", monospace; font-size: 12px;
+      color: var(--muted); white-space: nowrap;
+    }
+    .whoami a { color: var(--muted); }
 
+    /* ── Progress ── */
+    .progress-row {
+      display: flex; align-items: center; gap: 10px; margin: 14px 0 16px;
+    }
+    .progress-track {
+      flex: 1; height: 6px; background: var(--border);
+      border-radius: 4px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; width: var(--w, 0%);
+      background: var(--accent); transition: width 0.3s ease;
+    }
     .tally {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 13.5px;
-      color: var(--muted);
+      font-family: "IBM Plex Mono", monospace; font-size: 12.5px;
+      color: var(--muted); white-space: nowrap;
     }
     .tally b { color: var(--ink); }
 
-    /* ── Progress bar ── */
-    .progress-track {
-      width: 100%;
-      max-width: 760px;
-      height: 6px;
-      background: var(--border);
-      margin-bottom: 32px;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      width: var(--w, 0%);
-      background: var(--accent);
-      transition: width 0.3s ease;
-    }
-
-    /* ── Navigation row ── */
+    /* ── Navigation ── */
     .nav-row {
-      width: 100%;
-      max-width: 760px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      gap: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-bottom: 12px;
     }
-
     .nav-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 7px;
-      padding: 8px 16px;
-      font-family: "IBM Plex Sans", sans-serif;
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--ink);
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.12s, border-color 0.12s;
-      user-select: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 40px; padding: 8px 16px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      color: var(--ink); text-decoration: none; cursor: pointer;
+      font-family: inherit;
     }
-    .nav-btn:hover { background: var(--border); border-color: var(--muted); }
     .nav-btn:active { transform: scale(0.97); }
-    .nav-btn.disabled {
-      opacity: 0.35;
-      pointer-events: none;
-      cursor: default;
-    }
-
+    .nav-btn.disabled { opacity: 0.3; pointer-events: none; }
     .nav-center {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 12.5px;
-      color: var(--muted);
-      text-align: center;
-      flex: 1;
+      flex: 1; text-align: center;
+      font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--muted);
     }
     .nav-center b { color: var(--ink); }
-
-    /* ── Tweet card ── */
-    .card {
-      width: 100%;
-      max-width: 760px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 36px 32px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-      position: relative;
+    .nav-center input {
+      width: 5.5em; font-family: inherit; font-size: 12.5px; text-align: center;
+      padding: 5px 2px; border: 1.5px solid var(--border); border-radius: 6px;
+      background: var(--surface); color: var(--ink);
     }
 
-    /* Sentence badge */
+    /* ── Text card ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 22px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
     .sentence-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 11.5px;
-      color: var(--muted);
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2px 10px;
-      margin-bottom: 14px;
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted);
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2px 10px; margin-bottom: 12px;
     }
     .sentence-badge .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: inline-block;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); display: inline-block;
     }
-
-    /* Already-labeled banner */
     .labeled-banner {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 8px 14px;
-      border-radius: 6px;
-      margin-bottom: 18px;
+      display: block; font-size: 12.5px; font-weight: 500;
+      padding: 8px 12px; border-radius: 6px; margin-bottom: 14px;
     }
-    .labeled-banner.positive { background: var(--positive-bg); color: var(--positive); }
-    .labeled-banner.neutral  { background: var(--neutral-bg);  color: var(--neutral);  }
-    .labeled-banner.negative { background: var(--negative-bg); color: var(--negative); }
-    .labeled-banner.dont_know{ background: var(--unsure-bg);  color: var(--unsure);   }
-
     .tweet-text {
       font-family: "IBM Plex Sans Devanagari", "Nirmala UI", sans-serif;
-      font-size: 24px;
-      line-height: 1.7;
-      color: var(--ink);
-      margin: 0 0 24px;
-      white-space: pre-wrap;
+      font-size: 21px; line-height: 1.75; margin: 0 0 18px; white-space: pre-wrap;
+      word-break: break-word;
     }
-
+    @media (min-width: 600px) { .tweet-text { font-size: 24px; } }
     .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 12.5px;
-      color: var(--muted);
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 6px 14px;
+      font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--muted);
+      padding-top: 14px; border-top: 1px solid var(--border);
     }
     .meta a { color: var(--accent); text-decoration: none; font-weight: 500; }
-    .meta a:hover { text-decoration: underline; }
 
-    /* ── Sentiment buttons ── */
-    .choices {
-      width: 100%;
-      max-width: 760px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 24px;
-    }
-    @media (max-width: 560px) {
-      .choices { grid-template-columns: repeat(2, 1fr); }
-    }
-
+    /* ── Sentiment scale ── */
+    .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .choices form { margin: 0; }
     .choice-btn {
-      width: 100%;
-      border: 1.5px solid var(--border);
+      width: 100%; min-height: 52px;
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
       background: var(--surface);
-      border-radius: 8px;
-      padding: 16px 8px 14px;
-      cursor: pointer;
+      border: 1.5px solid var(--border);
+      border-left: 5px solid var(--c);
+      border-radius: 9px;
       font-family: "IBM Plex Sans", sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--ink);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s ease;
+      font-size: 15.5px; font-weight: 600; color: var(--ink);
+      text-align: left; cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
     }
-    .choice-btn:active { transform: scale(0.97); }
+    .choice-btn:active { transform: scale(0.985); }
+    .choice-btn .np {
+      font-family: "IBM Plex Sans Devanagari", sans-serif;
+      font-size: 13.5px; font-weight: 400; color: var(--muted); margin-left: auto;
+    }
     .choice-btn .key {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 11px;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      width: 22px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 4px;
+      width: 22px; height: 22px; flex: 0 0 22px;
+      display: flex; align-items: center; justify-content: center;
     }
-
-    .choice-btn.positive:hover,
-    .choice-btn.positive.selected { background: var(--positive-bg); border-color: var(--positive); color: var(--positive); }
-    .choice-btn.neutral:hover,
-    .choice-btn.neutral.selected  { background: var(--neutral-bg);  border-color: var(--neutral);  color: var(--neutral); }
-    .choice-btn.negative:hover,
-    .choice-btn.negative.selected { background: var(--negative-bg); border-color: var(--negative); color: var(--negative); }
-    .choice-btn.unsure:hover,
-    .choice-btn.unsure.selected   { background: var(--unsure-bg);   border-color: var(--unsure);   color: var(--unsure); }
-
-    /* Selected ring */
+    .choice-btn:hover { background: var(--cbg); }
     .choice-btn.selected {
-      outline: 2.5px solid currentColor;
-      outline-offset: 2px;
+      background: var(--cbg); border-color: var(--c); color: var(--c);
+      box-shadow: inset 0 0 0 1px var(--c);
     }
-    .choice-btn.selected .key {
-      color: currentColor;
-      border-color: currentColor;
-    }
+    .choice-btn.selected .np, .choice-btn.selected .key { color: var(--c); border-color: var(--c); }
 
     .hint {
-      max-width: 760px;
-      width: 100%;
-      text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 20px;
+      text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px;
     }
+    @media (max-width: 600px) { .hint { display: none; } }
 
-    /* ── Done card ── */
     .done-card {
-      width: 100%;
-      max-width: 760px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 60px 32px;
-      text-align: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 56px 24px; text-align: center;
     }
+    .done-card h1 { font-size: 22px; margin: 0 0 8px; }
+    .done-card p { color: var(--muted); font-size: 14px; }
   </style>
 </head>
 <body>
+<div class="wrap">
 
   <div class="topbar">
     <div class="brand">NEPSEE <span>Annotator</span></div>
-    <div class="tally"><b>{{ progress.labeled }}</b> / {{ progress.total }} ({{ progress.percent }}%)</div>
+    <div class="whoami">Annotator {{ annotator_id }} · <a href="{{ url_for('logout') }}">sign out</a></div>
   </div>
 
-  <div class="progress-track">
-    <div class="progress-fill" style="--w: {{ progress.percent }}%;"></div>
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" style="--w: {{ progress.percent }}%;"></div></div>
+    <div class="tally"><b>{{ progress.labeled }}</b>/{{ progress.total }} · {{ progress.percent }}%</div>
   </div>
 
   {% if done %}
     <div class="done-card">
-      <h1>All Tweets Annotated ✓</h1>
-      <p>{{ progress.labeled }} of {{ progress.total }} records have been catalogued.</p>
+      <h1>All done ✓</h1>
+      <p>You have labelled all {{ progress.total }} sentences. Thank you!</p>
     </div>
   {% else %}
 
-    <!-- ── Navigation row ── -->
     <div class="nav-row">
       {% if prev_idx is not none %}
         <a class="nav-btn" href="{{ url_for('index', idx=prev_idx) }}" id="btn-prev">← Back</a>
@@ -303,9 +206,13 @@
         <span class="nav-btn disabled">← Back</span>
       {% endif %}
 
-      <span class="nav-center">
-        Row <b>{{ current_idx + 1 }}</b> of <b>{{ progress.total }}</b>
-      </span>
+      <form class="nav-center" method="get" action="{{ url_for('index') }}" id="jump-form">
+        <input type="number" id="jump-box" min="1" max="{{ progress.total }}"
+               value="{{ current_idx + 1 }}" aria-label="Jump to sentence number"
+               onchange="this.form.requestSubmit()">
+        of {{ progress.total }}
+        <input type="hidden" name="idx" id="jump-idx">
+      </form>
 
       {% if next_idx is not none %}
         <a class="nav-btn" href="{{ url_for('index', idx=next_idx) }}" id="btn-next">Next →</a>
@@ -314,10 +221,7 @@
       {% endif %}
     </div>
 
-    <!-- ── Tweet card ── -->
     <div class="card">
-
-      <!-- Sentence indicator (only show when there are multiple sentences for this tweet) -->
       {% if tweet.total_sentences > 1 %}
         <div class="sentence-badge">
           <span class="dot"></span>
@@ -325,15 +229,10 @@
         </div>
       {% endif %}
 
-      <!-- Already-labeled banner -->
-      {% if tweet.sentiment %}
-        <div class="labeled-banner {{ tweet.sentiment }}">
-          {% if tweet.sentiment == "positive" %}✅ Already labeled: Positive
-          {% elif tweet.sentiment == "neutral" %}⚪ Already labeled: Neutral
-          {% elif tweet.sentiment == "negative" %}❌ Already labeled: Negative
-          {% else %}❓ Already labeled: Don't know
-          {% endif %}
-          — click a button below to change it.
+      {% if current_label %}
+        <div class="labeled-banner"
+             style="background: var(--{{ current_label }}-bg); color: var(--{{ current_label }});">
+          You already labelled this — tap another button to change it.
         </div>
       {% endif %}
 
@@ -342,76 +241,53 @@
       <div class="meta">
         {% if tweet.handle %}<span>@{{ tweet.handle }}</span>{% endif %}
         {% if tweet.created_at and tweet.created_at != 'nan' %}<span>{{ tweet.created_at }}</span>{% endif %}
-        {% if tweet.likes and tweet.likes != 'nan' and tweet.likes != '0' %}<span>♥ {{ tweet.likes }}</span>{% endif %}
-        {% if tweet.retweets and tweet.retweets != 'nan' and tweet.retweets != '0' %}<span>↻ {{ tweet.retweets }}</span>{% endif %}
-        {% if tweet.url and tweet.url != 'nan' %}<a href="{{ tweet.url }}" target="_blank" rel="noopener">Open Source ↗</a>{% endif %}
+        {% if tweet.url and tweet.url != 'nan' %}<a href="{{ tweet.url }}" target="_blank" rel="noopener">Open source ↗</a>{% endif %}
       </div>
     </div>
 
-    <!-- ── Sentiment choice buttons ── -->
     <div class="choices">
-      <form method="post" action="/rate" id="form-1">
-        <input type="hidden" name="tweet_id"    value="{{ tweet.id }}">
-        <input type="hidden" name="current_idx" value="{{ current_idx }}">
-        <input type="hidden" name="label" value="positive">
-        <button type="submit" class="choice-btn positive{% if tweet.sentiment == 'positive' %} selected{% endif %}">
-          <span class="key">1</span> Positive
-        </button>
-      </form>
-
-      <form method="post" action="/rate" id="form-2">
-        <input type="hidden" name="tweet_id"    value="{{ tweet.id }}">
-        <input type="hidden" name="current_idx" value="{{ current_idx }}">
-        <input type="hidden" name="label" value="neutral">
-        <button type="submit" class="choice-btn neutral{% if tweet.sentiment == 'neutral' %} selected{% endif %}">
-          <span class="key">2</span> Neutral
-        </button>
-      </form>
-
-      <form method="post" action="/rate" id="form-3">
-        <input type="hidden" name="tweet_id"    value="{{ tweet.id }}">
-        <input type="hidden" name="current_idx" value="{{ current_idx }}">
-        <input type="hidden" name="label" value="negative">
-        <button type="submit" class="choice-btn negative{% if tweet.sentiment == 'negative' %} selected{% endif %}">
-          <span class="key">3</span> Negative
-        </button>
-      </form>
-
-      <form method="post" action="/rate" id="form-4">
-        <input type="hidden" name="tweet_id"    value="{{ tweet.id }}">
-        <input type="hidden" name="current_idx" value="{{ current_idx }}">
-        <input type="hidden" name="label" value="dont_know">
-        <button type="submit" class="choice-btn unsure{% if tweet.sentiment == 'dont_know' %} selected{% endif %}">
-          <span class="key">4</span> Don't know
-        </button>
-      </form>
+      {% for key, name_en, name_np in labels %}
+        <form method="post" action="{{ url_for('rate') }}" id="form-{{ loop.index }}">
+          <input type="hidden" name="row_id"      value="{{ tweet.row_id }}">
+          <input type="hidden" name="current_idx" value="{{ current_idx }}">
+          <input type="hidden" name="label"       value="{{ key }}">
+          <button type="submit"
+                  class="choice-btn{% if current_label == key %} selected{% endif %}"
+                  style="--c: var(--{{ key }}); --cbg: var(--{{ key }}-bg);">
+            <span class="key">{{ loop.index }}</span>
+            {{ name_en }}
+            <span class="np">{{ name_np }}</span>
+          </button>
+        </form>
+      {% endfor %}
     </div>
 
     <p class="hint">
-      Press <b>1</b>, <b>2</b>, <b>3</b>, or <b>4</b> to label instantly &nbsp;·&nbsp;
-      <b>←</b> / <b>→</b> arrow keys to navigate
+      Press <b>1</b>–<b>6</b> to label &nbsp;·&nbsp; <b>←</b> / <b>→</b> to move between sentences
     </p>
 
     <script>
+      // The visible box is 1-based; the server wants a 0-based index.
+      document.getElementById("jump-form").addEventListener("submit", (e) => {
+        const total = {{ progress.total }};
+        const n = Math.max(1, Math.min(total, parseInt(document.getElementById("jump-box").value, 10) || 1));
+        document.getElementById("jump-idx").value = n - 1;
+      });
+
       document.addEventListener("keydown", (e) => {
-        // Sentiment shortcut keys
-        const labelMap = { "1": "form-1", "2": "form-2", "3": "form-3", "4": "form-4" };
-        if (labelMap[e.key]) {
-          document.getElementById(labelMap[e.key])?.requestSubmit();
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+        if (e.key >= "1" && e.key <= "6") {
+          document.getElementById("form-" + e.key)?.requestSubmit();
           return;
         }
-        // Arrow-key navigation (don't intercept if user is typing in an input)
-        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-        if (e.key === "ArrowLeft") {
-          const prev = document.getElementById("btn-prev");
-          if (prev) prev.click();
-        } else if (e.key === "ArrowRight") {
-          const next = document.getElementById("btn-next");
-          if (next) next.click();
-        }
+        if (e.key === "ArrowLeft")  document.getElementById("btn-prev")?.click();
+        if (e.key === "ArrowRight") document.getElementById("btn-next")?.click();
       });
     </script>
   {% endif %}
 
+</div>
 </body>
 </html>

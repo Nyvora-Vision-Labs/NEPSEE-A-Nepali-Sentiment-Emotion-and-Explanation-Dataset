@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEPSEE Annotator — Sign in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #E9E6DC; --surface: #FFFFFF; --ink: #22252B;
+      --muted: #6E6D64; --border: #DAD6C8; --accent: #7A1F2B;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+      font-family: "IBM Plex Sans", sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 24px 16px;
+    }
+    .card {
+      width: 100%; max-width: 380px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; padding: 32px 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: 0.01em; }
+    h1 span { color: var(--accent); }
+    .sub { font-size: 13.5px; color: var(--muted); margin: 0 0 24px; }
+    label {
+      display: block; font-size: 12.5px; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    }
+    .field { margin-bottom: 20px; }
+    input[type="password"] {
+      width: 100%; font-family: "IBM Plex Sans", sans-serif; font-size: 16px;
+      padding: 13px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--bg); color: var(--ink);
+    }
+    input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .who { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .who input { position: absolute; opacity: 0; pointer-events: none; }
+    .who label {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      text-transform: none; letter-spacing: 0; margin: 0; cursor: pointer;
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 4px;
+      background: var(--bg); font-size: 12px; color: var(--muted); font-weight: 500;
+    }
+    .who label b { font-family: "IBM Plex Mono", monospace; font-size: 20px; color: var(--ink); font-weight: 500; }
+    .who input:checked + label {
+      border-color: var(--accent); background: var(--surface);
+      color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent);
+    }
+    .who input:checked + label b { color: var(--accent); }
+    button {
+      width: 100%; padding: 14px; font-size: 15px; font-weight: 600;
+      font-family: "IBM Plex Sans", sans-serif; color: #fff; background: var(--accent);
+      border: none; border-radius: 8px; cursor: pointer;
+    }
+    button:active { transform: scale(0.99); }
+    .error {
+      background: #F4E5E1; color: #A6402E; font-size: 13px; padding: 10px 12px;
+      border-radius: 6px; margin-bottom: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>NEPSEE <span>Annotator</span></h1>
+    <p class="sub">Sign in with the number and password you were given.</p>
+
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+    <form method="post">
+      <div class="field">
+        <label>Which annotator are you?</label>
+        <div class="who">
+          {% for n in [1, 2, 3] %}
+            <input type="radio" name="annotator_id" id="a{{ n }}" value="{{ n }}" {% if n == 1 %}checked{% endif %}>
+            <label for="a{{ n }}"><b>{{ n }}</b> Annotator</label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit">Sign in</button>
+    </form>
+  </div>
+</body>
+</html>
