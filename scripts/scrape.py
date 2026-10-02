@@ -19,7 +19,7 @@ Usage:
             either a flat {"auth_token": "...", "ct0": "..."} dict, or
             Cookie-Editor's [{"name": ..., "value": ...}, ...] array
             format both work; the script normalizes it automatically.
-    3. Run: python scrape_tweets.py
+    3. Run: python scripts/scrape.py
 
 Output:
     tweets.json  -> {handle: [ {id, text, created_at, likes, retweets, url}, ... ]}
@@ -172,7 +172,7 @@ async def main():
     if not Path(input_path).exists():
         log.info(f"Input file not found: {input_path}")
         log.info("Place accounts.json next to this script, or pass a path:")
-        log.info("  python scrape_tweets.py /path/to/accounts.json")
+        log.info("  python scripts/scrape.py /path/to/accounts.json")
         return
 
     accounts = load_handles(input_path)

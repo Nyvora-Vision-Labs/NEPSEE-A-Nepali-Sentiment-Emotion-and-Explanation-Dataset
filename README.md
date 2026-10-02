@@ -31,7 +31,7 @@ _explanation_ layers named in the project title are planned but not yet built.
 
 ## Pipeline
 
-### 1. Collection — `scrape.py`
+### 1. Collection — `scripts/scrape.py`
 
 Tweets were pulled from 20 accounts using [Twikit](https://github.com/d60/twikit), via
 the [PawiX25/twifork](https://github.com/PawiX25/twifork) fork, which is needed because
@@ -50,7 +50,7 @@ unattended overnight.
 
 **Output:** `data/tweets.json` and `data/tweets.csv` — 9,931 tweets.
 
-### 2. Language filtering — `analyze.ipynb`
+### 2. Language filtering — `notebooks/analyze.ipynb`
 
 Three passes, documented in full with counts in [`reports/data_filter.md`](reports/data_filter.md):
 
@@ -64,7 +64,7 @@ Three passes, documented in full with counts in [`reports/data_filter.md`](repor
 
 **Output:** `data/filtered_data.csv` — 6,824 tweets.
 
-### 3. Sentence segmentation — `split_sentences.py`
+### 3. Sentence segmentation — `scripts/split_sentences.py`
 
 Tweets frequently contain several distinct opinions, which makes a single sentiment
 label for a whole tweet lossy. Each tweet is therefore split on the Nepali danda (`।`)
@@ -144,15 +144,18 @@ it deploys with the app.
 │   ├── login.html          Annotator sign-in
 │   ├── index.html          Labelling screen
 │   └── admin.html          Progress dashboard
-├── scrape.py               Tweet collection via Twikit
-├── split_sentences.py      Tweet → sentence expansion (one-time migration)
-├── drop_short_sentences.py Removes sentences shorter than 5 words
-├── analyze.ipynb           Filtering pipeline and corpus statistics
+├── scripts/
+│   ├── scrape.py           Tweet collection via Twikit
+│   ├── split_sentences.py  Tweet → sentence expansion (one-time migration)
+│   └── drop_short_sentences.py  Removes sentences shorter than 5 words
+├── notebooks/
+│   └── analyze.ipynb       Filtering pipeline and corpus statistics
 ├── data/
 │   ├── accounts.json       The 20 source accounts
 │   ├── tweets.json/.csv    Raw scrape output (9,931 tweets)
 │   ├── filtered_data.csv   Annotation corpus (10,947 sentence rows)
-│   └── filtered_data_backup.csv   Pre-segmentation snapshot
+│   ├── filtered_data_backup.csv   Pre-segmentation snapshot
+│   └── labels/             Label snapshots (see "Labels" below)
 ├── reports/
 │   ├── account_details.md  Source accounts, categories, selection rationale
 │   ├── data_filter.md      Filtering pipeline with per-stage counts
@@ -162,6 +165,20 @@ it deploys with the app.
 ├── requirements.txt
 └── DEPLOY.md               Hosting walkthrough (Render + Neon)
 ```
+
+## Labels
+
+`data/labels/` holds label snapshots keyed by `item_id` (`tweet_id:sentence_index`, as in
+`filtered_data.csv`).
+
+| File | Contents |
+|---|---|
+| `human_annotations.csv` | Human labels exported from the annotation database on 1 October 2026: `annotator_id, item_id, label, updated_at`. Annotator 3 had labelled 5,732 sentences and annotator 2 had labelled 326 by then; annotation is ongoing, so the live database holds more. |
+| `llm_labels.csv` | Zero-shot labels for the same 5,732 sentences from five LLMs, one column each. Gemini 3.8 Flash, Gemini 3.1 Pro (preview), Qwen3.5-397B-A17B and Qwen3.5-9B were queried through OpenRouter on 1 October 2026, one sentence per call at temperature 0, with a prompt restating the annotator brief. Claude Opus 5.5 labelled the sentences on 2 October 2026 through Claude Code, in batches of 40–60 under the same brief and blind to all other labels. |
+| `removed_slips.csv` | 41 sentences whose annotator-3 label has the opposite polarity to the label all four OpenRouter LLMs agreed on, treated as likely annotation slips. The columns are `item_id, handle, annotator3_label, all4_llm_label, sentence_text`. |
+
+All label columns use the six labels of the annotation app: `strongly_positive`, `positive`,
+`neutral`, `negative`, `strongly_negative` and `dont_know`.
 
 ## `data/filtered_data.csv` schema
 
@@ -193,7 +210,7 @@ changes, which is why it is not used as a key.
 Two things to preserve when regenerating:
 
 - **`tweet_id` and `sentence_index` must stay stable** for sentences that already exist.
-  Re-running `split_sentences.py` on unchanged text reproduces them exactly.
+  Re-running `scripts/split_sentences.py` on unchanged text reproduces them exactly.
 - **Each `(tweet_id, sentence_index)` pair must be unique.** The app refuses to start
   otherwise, rather than let two sentences silently share one label.
 

@@ -4,7 +4,7 @@ drop_short_sentences.py
 Remove sentence rows that are too short to carry usable sentiment
 (fragments like 'जय नेपाल' or 'राधे').
 
-Run after split_sentences.py:  python3 drop_short_sentences.py
+Run after split_sentences.py:  python3 scripts/drop_short_sentences.py
 
 Annotations are keyed on tweet_id:sentence_index, so dropping rows never
 orphans an existing label — the surviving rows keep their identity.
@@ -14,7 +14,8 @@ orphans an existing label — the surviving rows keep their identity.
 from pathlib import Path
 import pandas as pd
 
-CSV_PATH = Path("data/filtered_data.csv")
+ROOT = Path(__file__).resolve().parent.parent
+CSV_PATH = ROOT / Path("data/filtered_data.csv")
 MIN_WORDS = 5
 
 

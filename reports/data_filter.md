@@ -77,7 +77,7 @@ Saved to `filtered_data.csv` with `index=False`.
 
 The tweet-level corpus above was expanded so that **each row is a single sentence**, because a tweet can shift sentiment between its own clauses and a single per-tweet label would flatten that.
 
-Splitting is done in `split_sentences.py` on the cleaned `text_nepali_only` column, breaking on the Devanagari danda (`।`) followed by whitespace, or on newlines:
+Splitting is done in `scripts/split_sentences.py` on the cleaned `text_nepali_only` column, breaking on the Devanagari danda (`।`) followed by whitespace, or on newlines:
 
 ```python
 parts = re.split(r"(?<=।)\s+|\n+", text)
@@ -105,7 +105,7 @@ The script is idempotent — it detects the `row_id` / `tweet_id` columns and re
 
 ## 5. Drop Short Sentences (<5 words)
 
-The tweet-level `≥4` word threshold from Step 3 was applied to whole tweets, so splitting re-introduced short fragments: a 20-word tweet passing the filter could still break into a 15-word clause and a 3-word one. A second pass, `drop_short_sentences.py`, applies a `MIN_WORDS = 5` threshold to `sentence_text` directly.
+The tweet-level `≥4` word threshold from Step 3 was applied to whole tweets, so splitting re-introduced short fragments: a 20-word tweet passing the filter could still break into a 15-word clause and a 3-word one. A second pass, `scripts/drop_short_sentences.py`, applies a `MIN_WORDS = 5` threshold to `sentence_text` directly.
 
 ```python
 words = df["sentence_text"].fillna("").str.split().map(len)
@@ -141,7 +141,7 @@ Dropping these eliminated 163 tweets entirely (every one of their sentences was 
 
 **Annotation corpus: 10,947 Nepali sentences drawn from 6,661 tweets**, columns: `row_id, handle, id, text, created_at, likes, retweets, url, text_nepali_only, is_valid_nepali_only, word_count, sentiment, tweet_id, sentence_text, sentence_index`.
 
-Pipeline order for future scrapes: `scrape.py` → language filtering (`analyze.ipynb`) → `split_sentences.py` → `drop_short_sentences.py`.
+Pipeline order for future scrapes: `scripts/scrape.py` → language filtering (`notebooks/analyze.ipynb`) → `scripts/split_sentences.py` → `scripts/drop_short_sentences.py`.
 
 ## Notes / Open Items
 

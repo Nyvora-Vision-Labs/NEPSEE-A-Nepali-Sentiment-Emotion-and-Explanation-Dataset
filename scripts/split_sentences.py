@@ -5,7 +5,7 @@ One-time migration: expand rows that contain multiple Nepali sentences
 (separated by ।) into individual rows, each with their own `row_id` and a
 `tweet_id` pointing back to the original tweet.
 
-Run:  python3 split_sentences.py
+Run:  python3 scripts/split_sentences.py
 """
 
 from pathlib import Path
@@ -13,8 +13,9 @@ import pandas as pd
 import re
 import shutil
 
-CSV_PATH = Path("data/filtered_data.csv")
-BACKUP_PATH = Path("data/filtered_data_backup.csv")
+ROOT = Path(__file__).resolve().parent.parent
+CSV_PATH = ROOT / Path("data/filtered_data.csv")
+BACKUP_PATH = ROOT / Path("data/filtered_data_backup.csv")
 
 
 def split_sentences(text: str) -> list[str]:
